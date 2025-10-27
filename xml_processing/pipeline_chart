@@ -1,0 +1,21 @@
+digraph {
+	rankdir=LR size="8,5"
+	"250LIC4523.FANOUTA.OP[1]" [label="250LIC4523.FANOUTA.OP[1]" fillcolor="#e6f2ff" shape=box style="rounded,filled"]
+	"250FIC4521.PIDA.SP" [label="250FIC4521.PIDA.SP" fillcolor="#f9e6ff" shape=box style="rounded,filled"]
+	"250LIC4523.FANOUTA.OP[1]" -> "250FIC4521.PIDA.SP"
+	"250FI4521.DACA.PV" [label="250FI4521.DACA.PV" fillcolor="#e6f2ff" shape=box style="rounded,filled"]
+	"250FIC4521.DACA.P1" [label="250FIC4521.DACA.P1" fillcolor="#f9e6ff" shape=box style="rounded,filled"]
+	"250FI4521.DACA.PV" -> "250FIC4521.DACA.P1"
+	"250FIC4521.FANOUTA.OP[1]" [label="250FIC4521.FANOUTA.OP[1]" fillcolor="#e6f2ff" shape=box style="rounded,filled"]
+	"250FX4555A.SELREALA.IN[1]" [label="250FX4555A.SELREALA.IN[1]" fillcolor="#f9e6ff" shape=box style="rounded,filled"]
+	"250FIC4521.FANOUTA.OP[1]" -> "250FX4555A.SELREALA.IN[1]"
+	"250FIC4521.FANOUTA.OP[1]" [label="250FIC4521.FANOUTA.OP[1]" fillcolor="#e6f2ff" shape=box style="rounded,filled"]
+	"250FX4555A.AUTOMANA.X1" [label="250FX4555A.AUTOMANA.X1" fillcolor="#f9e6ff" shape=box style="rounded,filled"]
+	"250FIC4521.FANOUTA.OP[1]" -> "250FX4555A.AUTOMANA.X1"
+	"250FIC4521.FANOUTA.OP[2]" [label="250FIC4521.FANOUTA.OP[2]" fillcolor="#e6f2ff" shape=box style="rounded,filled"]
+	"250FX4555B.SELREALA.IN[1]" [label="250FX4555B.SELREALA.IN[1]" fillcolor="#f9e6ff" shape=box style="rounded,filled"]
+	"250FIC4521.FANOUTA.OP[2]" -> "250FX4555B.SELREALA.IN[1]"
+	"250FIC4521.FANOUTA.OP[2]" [label="250FIC4521.FANOUTA.OP[2]" fillcolor="#e6f2ff" shape=box style="rounded,filled"]
+	"250FX4555B.AUTOMANA.X1" [label="250FX4555B.AUTOMANA.X1" fillcolor="#f9e6ff" shape=box style="rounded,filled"]
+	"250FIC4521.FANOUTA.OP[2]" -> "250FX4555B.AUTOMANA.X1"
+}

@@ -1,0 +1,5 @@
+venv
+env
+*_venv
+*_files
+*_file
