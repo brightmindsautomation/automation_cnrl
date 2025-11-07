@@ -9,6 +9,3 @@ if ip:
 
     else:
         print(False)   
-
-
-

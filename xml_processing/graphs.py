@@ -1,63 +1,71 @@
 import pandas as pd
 
-
-li1 = [[1,2,3], [5,6,7]]
-
-temp = [2, 1, 3]
-
-if any(set(temp) == set(sublist) for sublist in li1):
-    print("True")
-
-else:
-    print("False")
-
-
-
-
-exit()
 # Define nodes and edges
 nodes = ['A', 'B', 'C', 'D', 'E']
 edges = [('A', 'B'), ('B', 'E'), ('A', 'C'), ('C', 'E'), ('E', 'A'), ('A', 'D')]
 
-# Initialize a square matrix of zeros
-adj_matrix = pd.DataFrame(0, index=nodes, columns=nodes)
 
-# Fill in the matrix based on edge directions
-for u, v in edges:
-    adj_matrix.loc[u, v] = 1     # direction u -> v
-    adj_matrix.loc[v, u] = -1    # reverse direction v -> u
+# Below script is taken from stack (Graph representation from tuple values)
 
-# print("Directed adjacency matrix (+1 forward, -1 reverse):\n")
-# print(adj_matrix)
+import pprint
+from collections import defaultdict
 
 
-A_row = adj_matrix.loc['A']
-ij_point = adj_matrix.iloc[1,1]
 
+class Graph(object):
+    """ Graph data structure, undirected by default. """
 
-# DFS traversal
-def traverse(matrix, nodes, start):
-    visited = set()
+    def __init__(self, connections, directed=False):
+        self._graph = defaultdict(set)
+        self._directed = directed
+        self.add_connections(connections)
 
-    def dfs(current_index):
-        current_node = nodes[current_index]
-        print(f"Visiting {current_node}")
-        visited.add(current_node)
+    def add_connections(self, connections):
+        """ Add connections (list of tuple pairs) to graph """
 
-        # Look across the entire row
-        for j, value in adj_matrix.iloc[current_index]:
-            print(j, value)
-            exit()
+        for node1, node2 in connections:
+            self.add(node1, node2)
 
-            if value != 0:  # means there’s a connection
-                next_node = nodes[j]
-                direction = "→" if value == 1 else "←"
-                print(f"  {current_node} {direction} {next_node}")
+    def add(self, node1, node2):
+        """ Add connection between node1 and node2 """
 
-                # Visit next node if not already visited
-                if next_node not in visited:
-                    dfs(j)
+        self._graph[node1].add(node2)
+        if not self._directed:
+            self._graph[node2].add(node1)
 
-    dfs(nodes.index(start))
+    def remove(self, node):
+        """ Remove all references to node """
 
-traverse(adj_matrix, nodes, "A")
+        for n, cxns in self._graph.items():  # python3: items(); python2: iteritems()
+            try:
+                cxns.remove(node)
+            except KeyError:
+                pass
+        try:
+            del self._graph[node]
+        except KeyError:
+            pass
+
+    def is_connected(self, node1, node2):
+        """ Is node1 directly connected to node2 """
+
+        return node1 in self._graph and node2 in self._graph[node1]
+
+    def find_path(self, node1, node2, path=[]):
+        """ Find any path between node1 and node2 (may not be shortest) """
+
+        path = path + [node1]
+        if node1 == node2:
+            return path
+        if node1 not in self._graph:
+            return None
+        for node in self._graph[node1]:
+            if node not in path:
+                new_path = self.find_path(node, node2, path)
+                if new_path:
+                    return new_path
+        return None
+
+    def __str__(self):
+        return '{}({})'.format(self.__class__.__name__, dict(self._graph))
+

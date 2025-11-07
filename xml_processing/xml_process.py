@@ -1,3 +1,7 @@
+# This script will analyse the larger volume of xml files in order to extract out the
+# links and relationship between them. (we are using adjacency matrix concept to 
+# get the relations between xml files (tags))
+
 import os
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -135,7 +139,7 @@ def independent_tags(prime_list):
     return set(dump_list) # Duplicate avoidance
 
 # ---------------- Example usage ----------------
-folder = "./latest_xml_files"   # change this
+folder = "./single_file"   # change this
 files = os.listdir(folder)
 xml_ext_files = []
 for file in files:
@@ -235,12 +239,14 @@ for i, node in enumerate(adj_matrix.index):
             master_incident_list.append(list_output_inc)         # Appending the incident matrix (for shorter link)
 
 
+
 if len(master_incident_list) >0:
     for ms_list in master_incident_list:
         print(ms_list)
         print("\n")
     
-    node_input = input("Enter the Node value to be search")
+    # node_input = input("Enter the Node value to be search")
+    node_input = "250DIC4545"
 
     if node_input:
         trackings = serch_track(node_input)
@@ -267,3 +273,10 @@ pipeline_maker(backward, forward)
 # Note: If search tag is in input_tag then you can find who supplied input (Going back)
 # Note: If search tag is in ouput_tag then you can find where it will go next (Going front)
 
+
+
+
+
+
+
+# cmd + shift + P
