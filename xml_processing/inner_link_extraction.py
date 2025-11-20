@@ -33,11 +33,11 @@ def find_foreign(cons_tags, current_tag):
     '''This function will separate the foreign tags from the cons tags WRT current tag'''
     tag_unique = set()
     for block in cons_tags:
-        sender_block = block[1].split('.')[0]
+        sender_block = block[1].split('.')[0]      # Considering only the 0th index of Tag
         receiver_block = block[0].split('.')[0]
          # Condition for avoiding current xml block (random one)
         if sender_block != current_tag or receiver_block != current_tag:
-            if sender_block == receiver_block:
+            if sender_block == receiver_block:     # from same family or block
                 tag_unique.add(sender_block)
             else:
                 tag_unique.add(sender_block)
@@ -51,15 +51,15 @@ def display_out(list_data):
             receiver = trf[0]
             sender = trf[1]
 
-            print(" {} is receiving the input from {}".format(receiver, sender))
+            print(" {} is receiving the input from {} \n".format(receiver, sender))
     
 # xml_path = "./single_file/250DIC4545.cnf.xml"
-random_xml_tag = "250FIC4521"
-xml_path = "./xml_files"
+random_xml_tag = "250DIC4545"
+xml_path = "./single_file"
 files = os.listdir(xml_path)
 random_filename = random_xml_tag + ".cnf.xml"
 # Scenario consideration: maximum number of adjacency per tag would be 2 (might go beyond this level)
-xml_thresh = 2      #Actually it's 3 but default one goes to random_tag
+xml_thresh = 3      #Actually it's 3 but default one goes to random_tag
 
 total_links = {}
 if random_filename in files:
@@ -69,13 +69,14 @@ if random_filename in files:
     filename = file_loc.name    # returns the filename with extenstion frm the whole path
     
     # Getting the whole connections for the single xml file (i.e single block)
-    traffic_consolidation = extract_inout(random_filepath) 
-
+    traffic_consolidation = extract_inout(random_filepath)
+    # print("traffic consolidation", traffic_consolidation)
     if len(traffic_consolidation) >0:
         foreign_blocks = find_foreign(traffic_consolidation, random_xml_tag)
         foreign_blocks = list(foreign_blocks)
+        print("foreign blocks", foreign_blocks)
         if len(foreign_blocks) >0:
-            if random_xml_tag in foreign_blocks:
+            if random_xml_tag in foreign_blocks:   # Incase of current tag presence
                 foreign_blocks.remove(random_xml_tag)
 
             # Now will explore the links of those foreign blocks
@@ -92,7 +93,6 @@ if random_filename in files:
 
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag
 ## Inside the total_links dictionary you can find the self connections of foreign blocks associated with user given tag
-
 
 ''' Below lines are just to display the output (you might get reference error incase if the data type is empty) '''
 print("Connections of the {}".format(random_xml_tag))

@@ -1,7 +1,6 @@
 # This script will analyse the larger volume of xml files in order to extract out the
 # links and relationship between them. (we are using adjacency matrix concept to 
 # get the relations between xml files (tags))
-
 import os
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -226,9 +225,6 @@ def serch_track(search_node):
 
             
 
-
-
-
 for i, node in enumerate(adj_matrix.index):
     incident_set = set()
     output_inc = iteration_adj(node, incident_set)    
@@ -245,6 +241,7 @@ if len(master_incident_list) >0:
         print(ms_list)
         print("\n")
     
+    exit()
     # node_input = input("Enter the Node value to be search")
     node_input = "250DIC4545"
 
