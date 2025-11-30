@@ -113,6 +113,8 @@ def block_separator(master_dict, current_tag):
 
     return inhouse_blocks, foreign_blocks
 
+
+
 def master_and_foreign(traffic_data, block_dict, inhouse, foreign):
     ''' This function used to describe the connections of inhouse main and foreign blocks'''
 
@@ -122,6 +124,7 @@ def master_and_foreign(traffic_data, block_dict, inhouse, foreign):
 Moreover it has been linked with following blocks{}\n"
 
     foreign_link_stat = "{} is a foreign block and connectd with {}\n"
+    secondary_blocks = []
     global master_node
     # Below line is only for the master connections or in house connections
     if len(inhouse) >0:
@@ -129,6 +132,7 @@ Moreover it has been linked with following blocks{}\n"
             mstr_conns = block_dict[mstr]
             master_node = mstr
             if len(mstr_conns) >0:
+                secondary_blocks.extend(mstr_conns)        # Extension of the list
                 print(master_stat.format(mstr, mstr_conns))
 
     # Below line is just to explain the overview of the available foreign blocks
@@ -137,17 +141,132 @@ Moreover it has been linked with following blocks{}\n"
         for fgn in foreign:
             fgn_conns = block_dict[fgn]
             if len(fgn_conns) >0:
+                secondary_blocks.extend(fgn_conns)    # Extension of the list
                 print(foreign_link_stat.format(fgn, fgn_conns))
 
-            for tf in traffic_data:
-                # Target:  foreign connection with master node 
-                # Finding what relation between master and foreign nodes
-                if tf[1].startswith(fgn) and tf[0].split('.')[0] == master_node:
-                    print("foreign block {} is passing input to Master Node in {} block \n".format(fgn, tf[0].split('.')[1]))
+            # for tf in traffic_data:
+            #     # Target:  foreign connection with master node 
+            #     # Finding what relation between master and foreign nodes
+            #     if tf[1].startswith(fgn) and tf[0].split('.')[0] == master_node:
+            #         print("foreign block {} is passing input to Master Node in {} block \n".format(fgn, tf[0].split('.')[1]))
 
-                elif tf[0].startswith(fgn) and tf[1].split('.')[0] == master_node:
-                    print("foreign block {} is receiving input from Master Node in {} block \n".format(fgn, tf[1].split('.')[1]))
+            #     elif tf[0].startswith(fgn) and tf[1].split('.')[0] == master_node:
+            #         print("foreign block {} is receiving input from Master Node in {} block \n".format(fgn, tf[1].split('.')[1]))
                 
+    
+    secondary_blocks = list(set(secondary_blocks))     # Ensuring no duplicates
+
+    ordered_blocks = []
+    global foreign_node_visit 
+    foreign_node_visit = False
+
+    #. *******************. Finding Start and End Blocks  ********************
+
+    # Target: Picking up the start point connection (at first it will be foreign block)
+    # Condition: if node has one way connection --> start, node has more than two way connection --> middle
+    FgnLinkedBlocks = []
+    for fgn in foreign:
+        fgn_conns = block_dict[fgn]
+        if len(fgn_conns) >0:   # find which one has minimal connections of it's next conn
+            for fgn in fgn_conns:
+                # Daca - 2 out 1 in
+                # Suba - 1 out 2 in
+                # find the immediate connection of those foreign blocks and ensure the in/out of them
+                for tf in traffic_data:
+                    # Target: Finding the connections that matches the fgn (block)
+                    if tf[0].split('.')[1] == fgn:    # Receiver block
+                        sender = tf[1].split('.')[1]
+                        FgnLinkedBlocks.append(sender)
+
+                    elif tf[1].split('.')[1] == fgn:    # Sender block
+                        receiver = tf[0].split('.')[1]
+                        FgnLinkedBlocks.append(receiver)
+
+    FgnLinkedBlocks = list(set(FgnLinkedBlocks))
+    if len(FgnLinkedBlocks) >0:
+        #Target: If the only i/p connection is determined by FGN block then it's our first path
+        for FgnLink in FgnLinkedBlocks:
+            # Pick when there is only foreign input no other block input
+            FgnIp = 0
+            FamIP = 0
+            for tf in traffic_data:
+                if tf[0].split('.')[1] == FgnLink:
+                    if tf[1].split('.')[0] != master_node:
+                        FgnIp +=1
+                    else:
+                        FamIP +=1
+        
+            print("Foreign I/P and Family I/P of {}".format(FgnLink), FgnIp, FamIP)
+            if FgnIp >0 and FamIP == 0:
+                ordered_blocks.append(FgnLink)
+
+    # *****************. Ordering the blocks ********** #
+    # Target: now we have the starting block with this we can iterate through the network
+
+    def ordering(StartBlock, ordered_blocks, traffic_data):
+        # Target: with the help of Start Block (DACA) we can proceed next consecutive blocks
+        # by doing the recursive iteration.
+        visited_blocks = set()
+        TempQueue = [StartBlock]
+
+        while TempQueue:
+            # print("Temp Queue", TempQueue)
+            # print("Visited blocks", visited_blocks)
+            # print("ordered blocks", ordered_blocks)
+            current = TempQueue.pop(0)     # this will help us to control the flow logic
+            if current in visited_blocks:
+                continue
+            visited_blocks.add(current)
+            # print("Current Ride", current)
+
+            for tf in traffic_data:   # Concentrate on passing to whom
+                # print("(dst, src)", (tf[0].split('.')[1], tf[1].split('.')[1]))
+                
+                if tf[1].split('.')[1] == current and tf[0].split('.')[1] != tf[1].split('.')[1]: # only it's not loop
+
+                    NextBlock = tf[0].split('.')[1]
+                    if NextBlock not in ordered_blocks:    # ensure it's not existed prev.
+                        ordered_blocks.append(NextBlock)
+                    TempQueue.append(NextBlock)
+                # Problem: when PIDA enters it went into loop and the program keep taking 
+                # PIDA as a startBlock (Need to change StartBlock when this condition occurs)
+
+    if len(ordered_blocks) >0:
+        StartBlock = ordered_blocks[0]
+        ordering(StartBlock, ordered_blocks, traffic_data)
+
+    #. ****************. End of the ordering functio **************** #
+
+    print("Ordered Blocks", ordered_blocks)
+
+    #. **************** Printing as per structure using ordered blocks ********
+
+    for conn_block in ordered_blocks:
+        print("\n")
+        print("***   {} Block section ***".format(conn_block))
+        print("\n")
+        for tf in traffic_data:
+            # Target: Finding inner block routemap
+            # Condition: either one of the block consists this conn_block or both sometimes
+            if tf[1].split('.')[1] == conn_block:  # Sender
+                abbr_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
+                rec_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
+                if tf[0].split('.')[0] == master_node:
+                    print("Block {} is sending the input to {} (Master)".format(abbr_block, rec_block))
+                else:
+                    print("Block {} is sending the input to {} (Foreign {})".format(abbr_block, rec_block, tf[0].split('.')[0]))
+
+            elif tf[0].split('.')[1] == conn_block:  # Receiver
+                abbr_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
+                send_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
+                if tf[1].split('.')[0] == master_node:
+                    print("Block {} is receiving the input from {} (Master)".format(abbr_block, send_block))
+                else:
+                    print("Block {} is receiving the input from {} (Foreign {})".format(abbr_block, send_block, tf[1].split('.')[0]))
+
+
+    exit()
+
     
     if master_node:
         # Only Trust: Connections are in sequential manner in xml file so we can proceed the same(no sort)
@@ -194,6 +313,8 @@ if random_filename in files:
     
     # Getting the whole connections for the single xml file (i.e single block)
     traffic_consolidation = extract_inout(random_filepath)
+
+    display_out(traffic_consolidation)
     
     block_dict = grouping(traffic_consolidation)
 
@@ -216,7 +337,4 @@ if random_filename in files:
 ''' Below lines are just to display the output (you might get reference error incase if the data type is empty) '''
 print("Connections of the {}".format(random_xml_tag))
 display_out(traffic_consolidation)
-            
-
-        
         
