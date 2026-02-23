@@ -49,7 +49,7 @@ for sheet_name in excel_file.sheet_names:
             )
             mask &= column_mask   # AND between columns
 
-    filtered_df = df[mask]
+    filtered_df = df.loc[mask].copy()
 
     if not filtered_df.empty:
         filtered_df["source_sheet"] = sheet_name
