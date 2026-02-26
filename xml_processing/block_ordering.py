@@ -80,7 +80,7 @@ def grouping(traffic_data):
             rec_sec_block = trf[0].split('.')[1]
             send_sec_block = trf[1].split('.')[1]
 
-            if send_mainblock == rec_mainblock: 
+            if send_mainblock == rec_mainblock:     # both send and receiving blocks are same
                 if not rec_sec_block in multi_block[send_mainblock]:
                     multi_block[send_mainblock].append(rec_sec_block)
 
@@ -156,6 +156,7 @@ Moreover it has been linked with following blocks{}\n"
     
     secondary_blocks = list(set(secondary_blocks))     # Ensuring no duplicates
 
+
     ordered_blocks = []
     global foreign_node_visit 
     foreign_node_visit = False
@@ -165,6 +166,7 @@ Moreover it has been linked with following blocks{}\n"
     # Target: Picking up the start point connection (at first it will be foreign block)
     # Condition: if node has one way connection --> start, node has more than two way connection --> middle
     FgnLinkedBlocks = []
+
     for fgn in foreign:
         fgn_conns = block_dict[fgn]
         if len(fgn_conns) >0:   # find which one has minimal connections of it's next conn
@@ -183,6 +185,8 @@ Moreover it has been linked with following blocks{}\n"
                         FgnLinkedBlocks.append(receiver)
 
     FgnLinkedBlocks = list(set(FgnLinkedBlocks))
+    print("Foreign linked blocks", FgnLinkedBlocks)
+
     if len(FgnLinkedBlocks) >0:
         #Target: If the only i/p connection is determined by FGN block then it's our first path
         for FgnLink in FgnLinkedBlocks:
@@ -221,9 +225,9 @@ Moreover it has been linked with following blocks{}\n"
 
             for tf in traffic_data:   # Concentrate on passing to whom
                 # print("(dst, src)", (tf[0].split('.')[1], tf[1].split('.')[1]))
+                # print(tf[1].split('.')[1], "->", tf[0].split('.')[1])
                 
-                if tf[1].split('.')[1] == current and tf[0].split('.')[1] != tf[1].split('.')[1]: # only it's not loop
-
+                if ((tf[1].split('.')[1] == current)) and tf[0].split('.')[1] != tf[1].split('.')[1]: # only it's not loop
                     NextBlock = tf[0].split('.')[1]
                     if NextBlock not in ordered_blocks:    # ensure it's not existed prev.
                         ordered_blocks.append(NextBlock)
@@ -231,15 +235,54 @@ Moreover it has been linked with following blocks{}\n"
                 # Problem: when PIDA enters it went into loop and the program keep taking 
                 # PIDA as a startBlock (Need to change StartBlock when this condition occurs)
 
+
     if len(ordered_blocks) >0:
         StartBlock = ordered_blocks[0]
         ordering(StartBlock, ordered_blocks, traffic_data)
 
     #. ****************. End of the ordering functio **************** #
 
-    print("Ordered Blocks", ordered_blocks)
+    OrderBlockSet = set(ordered_blocks)
+    MstrBlockSet = set(mstr_conns)
+    Missed = MstrBlockSet.difference(OrderBlockSet)
+    # if len(Missed) >0:
+    #     for miss in Missed:
+    #         ordered_blocks.append(miss)
+
+
+    # Note: Always direction from left to right is possible, where as (Always sender)
+    # Not always direction from right to left is possible (There might not be a receiver)
+
+    # $$$$$$$$$ New Implementation for missing blocks insertion at index pos $$$$
+
+    if len(Missed) >0:
+        visited_blocks = set()
+        TempQueue = list(Missed)
+    
+        while TempQueue:
+            current = TempQueue.pop(0)     # this will help us to control the flow logic
+            if current in visited_blocks:
+                continue
+            visited_blocks.add(current)
+            
+            for tf in traffic_data:
+                if tf[1].split('.')[1] == current:
+                    rec = tf[0].split('.')[1]
+                    if rec in ordered_blocks:
+                        print("Rec presents", rec)
+                        idx = ordered_blocks.index(rec)
+                        if idx == 0:
+                            ordered_blocks.insert(idx, current)
+                        else:
+                            ordered_blocks.insert(idx, current)
+                    else:
+                        TempQueue.append(current)
+
+     # $$$$$$$$$ New Implementation for missing blocks insertion at index pos $$$$
 
     #. **************** Printing as per structure using ordered blocks ********
+
+    print("Ordered Blocks", ordered_blocks)
 
     for conn_block in ordered_blocks:
         print("\n")
@@ -265,9 +308,7 @@ Moreover it has been linked with following blocks{}\n"
                     print("Block {} is receiving the input from {} (Foreign {})".format(abbr_block, send_block, tf[1].split('.')[0]))
 
 
-    exit()
-
-    
+    exit()  # Intentional exit action enabled (To avoid printing two times)
     if master_node:
         # Only Trust: Connections are in sequential manner in xml file so we can proceed the same(no sort)
         mstr_conns = block_dict[master_node]
@@ -297,7 +338,7 @@ Moreover it has been linked with following blocks{}\n"
 
 
 # xml_path = "./single_file/250DIC4545.cnf.xml"
-random_xml_tag = "250DIC4545"
+random_xml_tag = "250FIC4552"
 xml_path = "./single_file"
 files = os.listdir(xml_path)
 random_filename = random_xml_tag + ".cnf.xml"

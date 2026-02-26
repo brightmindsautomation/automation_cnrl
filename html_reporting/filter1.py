@@ -66,7 +66,7 @@ print(final_df)
 # Posted by Andy Hayden, modified by community. See post 'Timeline' for change history
 # Retrieved 2026-02-22, License - CC BY-SA 4.0
 
-final_df.to_csv('filtered.csv', sep='\t', encoding='utf-8', index=False, header=True)
+final_df.to_csv('filtered.csv', encoding='utf-8', index=False)
 
 
 
