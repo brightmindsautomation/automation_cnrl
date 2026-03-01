@@ -1,6 +1,7 @@
 # This python script is used to extract out the blocks and it's correponding connections,
 # parameters and symbol attributes. Later than we could use all these to order the 
 # connections and appropriate block parameters
+# Latest one
 
 import os
 import xml.etree.ElementTree as ET
@@ -464,7 +465,7 @@ Moreover it has been linked with following blocks{}\n"
 
 
 # xml_path = "./single_file/250DIC4545.cnf.xml"
-random_xml_tag = "250LX4032D"
+random_xml_tag = "250LIC4032"
 xml_path = "./single_file/new"
 files = os.listdir(xml_path)
 random_filename = random_xml_tag + ".cnf.xml"

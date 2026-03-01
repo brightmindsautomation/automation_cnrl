@@ -138,7 +138,7 @@ def independent_tags(prime_list):
     return set(dump_list) # Duplicate avoidance
 
 # ---------------- Example usage ----------------
-folder = "./single_file"   # change this
+folder = "./single_file/new"   # change this
 files = os.listdir(folder)
 xml_ext_files = []
 for file in files:
@@ -147,7 +147,7 @@ for file in files:
         xml_ext_files.append(file)
 
 
-search_tag = "250FI4521"         # change this
+search_tag = "250LIC4032"         # change this
 # extracting all input and output tags from xml files (individually)
 consolidated_tags = extract_inout(folder, xml_ext_files)
 
@@ -157,6 +157,8 @@ separated_tags = tag_separator(consolidated_tags)
 # Getting the primary tag value from the whole strng (mostly 1st index and in special cases use 2nd index)
 edges = separate_prime_tags(separated_tags) # Prime consolidation list will have whole list (not based on xml's)
 
+print("edges", edges)
+exit()
 # Extracting the tags independently
 # 1) Find how many independent tags are there?
 nodes = independent_tags(edges)
@@ -240,24 +242,30 @@ if len(master_incident_list) >0:
     for ms_list in master_incident_list:
         print(ms_list)
         print("\n")
-    
-    exit()
+
     # node_input = input("Enter the Node value to be search")
-    node_input = "250DIC4545"
+    node_input = "250LIC4032"
 
     if node_input:
         trackings = serch_track(node_input)
-        print("Trackings \n",trackings)
+        print("Trackings Length \n",len(trackings))
+        if len(trackings):
+            for trk in trackings:
+                print(trk)
+
+
 
 # print("Master Incident Set \n", master_incident_list)
+
+exit()   # After this line of execution (developed in block_ordering.py)
 
 # print("Here are the incident Node connection \n")
 # print(incident_set)
 
-
-exit()
 # search for specific tag where we can find the pipeline
 matched_tags = tag_search(separated_tags, search_tag)
+
+print("Matched Tages \n", matched_tags)
 
 # aligning the matched tags to it's corresponding direction (backward or forward)
 backward, forward = tag_navigator(matched_tags, search_tag)
