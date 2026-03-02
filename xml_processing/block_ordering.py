@@ -159,12 +159,12 @@ def master_only(traffic_data, block_dict, inhouse):
                         MstrLinkedBlocks.append(receiver)
 
     MstrLinkedBlocks = list(set(MstrLinkedBlocks))
-    print("Master linked blocks", MstrLinkedBlocks)
+    # print("Master linked blocks", MstrLinkedBlocks)
 
     if len(MstrLinkedBlocks) >0:
         ordered_blocks.append(MstrLinkedBlocks[0])
     
-    print("Ordered In House", ordered_blocks)
+    # print("Ordered In House", ordered_blocks)
 
     # *****************. Ordering the blocks ********** #
     # Target: now we have the starting block with this we can iterate through the network
@@ -202,7 +202,7 @@ def master_only(traffic_data, block_dict, inhouse):
         StartBlock = ordered_blocks[0]
         ordering(StartBlock, ordered_blocks, traffic_data)
 
-    print('Ordered phase 2', ordered_blocks)
+    # print('Ordered phase 2', ordered_blocks)
 
     #. ****************. End of the ordering functio **************** #
 
@@ -340,7 +340,7 @@ Moreover it has been linked with following blocks{}\n"
                         FgnLinkedBlocks.append(receiver)
 
     FgnLinkedBlocks = list(set(FgnLinkedBlocks))
-    print("Foreign linked blocks", FgnLinkedBlocks)
+    # print("Foreign linked blocks", FgnLinkedBlocks)
 
     if len(FgnLinkedBlocks) >0:
         #Target: If the only i/p connection is determined by FGN block then it's our first path
@@ -355,7 +355,7 @@ Moreover it has been linked with following blocks{}\n"
                     else:
                         FamIP +=1
         
-            print("Foreign I/P and Family I/P of {}".format(FgnLink), FgnIp, FamIP)
+            # print("Foreign I/P and Family I/P of {}".format(FgnLink), FgnIp, FamIP)
             if FgnIp >0 and FamIP == 0:
                 ordered_blocks.append(FgnLink)
 
@@ -424,7 +424,7 @@ Moreover it has been linked with following blocks{}\n"
                 if tf[1].split('.')[1] == current:
                     rec = tf[0].split('.')[1]
                     if rec in ordered_blocks:
-                        print("Rec presents", rec)
+                        # print("Rec presents", rec)
                         idx = ordered_blocks.index(rec)
                         if idx == 0:
                             ordered_blocks.insert(idx, current)
@@ -464,48 +464,45 @@ Moreover it has been linked with following blocks{}\n"
 
 
 
-# xml_path = "./single_file/250DIC4545.cnf.xml"
-random_xml_tag = "250LIC4032"
-xml_path = "./single_file/new"
-files = os.listdir(xml_path)
-random_filename = random_xml_tag + ".cnf.xml"
-# Scenario consideration: maximum number of adjacency per tag would be 2 (might go beyond this level)
-xml_thresh = 3      #Actually it's 3 but default one goes to random_tag
 
-total_links = {}
-if random_filename in files:
-    random_filepath = os.path.join(xml_path, random_filename)
-
-    file_loc = pathlib.Path(random_filepath)
-    filename = file_loc.name    # returns the filename with extenstion frm the whole path
-    
-    # Getting the whole connections for the single xml file (i.e single block)
-    traffic_consolidation = extract_inout(random_filepath)
-
-    display_out(traffic_consolidation)
-    
-    block_dict = grouping(traffic_consolidation)
-
-    print("Block list", block_dict)
-
-    # Separating the foreign block and current (random) block from the block_dict's key
-
-    inhouse, foreign = block_separator(block_dict, random_xml_tag)
-
-    # print("inhouse", inhouse)
-    # print("foreign", foreign)
-    if len(inhouse) >0 and len(foreign) >0:
-        master_and_foreign(traffic_consolidation, block_dict, inhouse, foreign)
-    elif len(foreign) == 0: # incase if there is no foreign connections (xml itself)
-        master_only(traffic_consolidation, block_dict, inhouse)
+def order_init(MasterXmlBlock, BasePath):
+    ''' Function receives input xml block and find it's ordering pattern inside the xml file '''
+    try:
+        files = os.listdir(BasePath)
+        target_filename = MasterXmlBlock + ".cnf.xml"
 
 
-    exit()
+        if target_filename in files:
+            random_filepath = os.path.join(BasePath, target_filename)
+
+            file_loc = pathlib.Path(random_filepath)
+            filename = file_loc.name    # returns the filename with extenstion frm the whole path
+            
+            # Getting the whole connections for the single xml file (i.e single block)
+            traffic_consolidation = extract_inout(random_filepath)
+
+            # Uncomment to view the block connections
+            # display_out(traffic_consolidation)
+            
+            block_dict = grouping(traffic_consolidation)
+
+            # Separating the foreign block and current (random) block from the block_dict's key
+
+            inhouse, foreign = block_separator(block_dict, MasterXmlBlock)
+
+            # print("inhouse", inhouse)
+            # print("foreign", foreign)
+            if len(inhouse) >0 and len(foreign) >0:
+                master_and_foreign(traffic_consolidation, block_dict, inhouse, foreign)
+            elif len(foreign) == 0: # incase if there is no foreign connections (xml itself)
+                master_only(traffic_consolidation, block_dict, inhouse)
+
+    except Exception as e:
+        print("Error Occured while calling Order Init function @block_ordering", e)
+
+# order_init("250LIC4032", "./single_file/new")
 
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag
 ## Inside the total_links dictionary you can find the self connections of foreign blocks associated with user given tag
 
-''' Below lines are just to display the output (you might get reference error incase if the data type is empty) '''
-print("Connections of the {}".format(random_xml_tag))
-display_out(traffic_consolidation)
         
