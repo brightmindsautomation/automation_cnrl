@@ -117,7 +117,7 @@ def block_separator(master_dict, current_tag):
 
 
 def master_only(traffic_data, block_dict, inhouse):
-    ''' This function used to describe the connections of inhouse main and foreign blocks'''
+    ''' This function used to describe the connections of inhouse main and no foreign blocks'''
 
     print("************   Link Explanation starts here  ***************")
 
@@ -133,123 +133,16 @@ def master_only(traffic_data, block_dict, inhouse):
             if len(mstr_conns) >0:
                 print(master_stat.format(mstr, mstr_conns))
 
-    ordered_blocks = []
-
     #. *******************. Finding Start and End Blocks  ********************
 
-    # Target: Picking up the start point connection (at first it will be foreign block)
-    # Condition: if node has one way connection --> start, node has more than two way connection --> middle
-    MstrLinkedBlocks = []
-
-    for house in inhouse:
-        inhaus_conns = block_dict[house]
-        if len(inhaus_conns) >0:   # find which one has minimal connections of it's next conn
-            for inh in inhaus_conns:
-                # Daca - 2 out 1 in
-                # Suba - 1 out 2 in
-                # find the immediate connection of those foreign blocks and ensure the in/out of them
-                for tf in traffic_data:
-                    # Target: Finding the connections that matches the fgn (block)
-                    if tf[0].split('.')[1] == inh:    # Receiver block
-                        sender = tf[1].split('.')[1]
-                        MstrLinkedBlocks.append(sender)
-
-                    elif tf[1].split('.')[1] == inh:    # Sender block
-                        receiver = tf[0].split('.')[1]
-                        MstrLinkedBlocks.append(receiver)
-
-    MstrLinkedBlocks = list(set(MstrLinkedBlocks))
-    # print("Master linked blocks", MstrLinkedBlocks)
-
-    if len(MstrLinkedBlocks) >0:
-        ordered_blocks.append(MstrLinkedBlocks[0])
-    
-    # print("Ordered In House", ordered_blocks)
-
-    # *****************. Ordering the blocks ********** #
-    # Target: now we have the starting block with this we can iterate through the network
-
-    def ordering(StartBlock, ordered_blocks, traffic_data):
-        # Target: with the help of Start Block (DACA) we can proceed next consecutive blocks
-        # by doing the recursive iteration.
-        visited_blocks = set()
-        TempQueue = [StartBlock]
-
-        while TempQueue:
-            # print("Temp Queue", TempQueue)
-            # print("Visited blocks", visited_blocks)
-            # print("ordered blocks", ordered_blocks)
-            current = TempQueue.pop(0)     # this will help us to control the flow logic
-            if current in visited_blocks:
-                continue
-            visited_blocks.add(current)
-            # print("Current Ride", current)
-
-            for tf in traffic_data:   # Concentrate on passing to whom
-                # print("(dst, src)", (tf[0].split('.')[1], tf[1].split('.')[1]))
-                # print(tf[1].split('.')[1], "->", tf[0].split('.')[1])
-                
-                if ((tf[1].split('.')[1] == current)) and tf[0].split('.')[1] != tf[1].split('.')[1]: # only it's not loop
-                    NextBlock = tf[0].split('.')[1]
-                    if NextBlock not in ordered_blocks:    # ensure it's not existed prev.
-                        ordered_blocks.append(NextBlock)
-                    TempQueue.append(NextBlock)
-                # Problem: when PIDA enters it went into loop and the program keep taking 
-                # PIDA as a startBlock (Need to change StartBlock when this condition occurs)
-
-
-    if len(ordered_blocks) >0:
-        StartBlock = ordered_blocks[0]
-        ordering(StartBlock, ordered_blocks, traffic_data)
-
-    # print('Ordered phase 2', ordered_blocks)
-
-    #. ****************. End of the ordering functio **************** #
-
-    OrderBlockSet = set(ordered_blocks)
-    MstrBlockSet = set(mstr_conns)
-    Missed = MstrBlockSet.difference(OrderBlockSet)
-    # if len(Missed) >0:
-    #     for miss in Missed:
-    #         ordered_blocks.append(miss)
-
-
-    # Note: Always direction from left to right is possible, where as (Always sender)
-    # Not always direction from right to left is possible (There might not be a receiver)
-
-    # $$$$$$$$$ New Implementation for missing blocks insertion at index pos $$$$
-
-    if len(Missed) >0:
-        visited_blocks = set()
-        TempQueue = list(Missed)
-    
-        while TempQueue:
-            current = TempQueue.pop(0)     # this will help us to control the flow logic
-            if current in visited_blocks:
-                continue
-            visited_blocks.add(current)
-            
-            for tf in traffic_data:
-                if tf[1].split('.')[1] == current:
-                    rec = tf[0].split('.')[1]
-                    if rec in ordered_blocks:
-                        idx = ordered_blocks.index(rec)
-                        if idx == 0:
-                            ordered_blocks.insert(idx, current)
-                        else:
-                            ordered_blocks.insert(idx, current)
-                    else:
-                        TempQueue.append(current)
-    else:
-        print("No Missing Blocks found --> Skipping")
-
-     # $$$$$$$$$ New Implementation for missing blocks insertion at index pos $$$$
+     # Note: When the xml file has only master connection and there is no foreign connection
+     # then we can't find which one is start block (so we can take a whole block and process it)
 
     #. **************** Printing as per structure using ordered blocks ********
 
-    print("Ordered Blocks Final", ordered_blocks)
+    print("Ordered Blocks Final", mstr_conns)
 
-    for conn_block in ordered_blocks:
+    for conn_block in mstr_conns:
         print("\n")
         print("***   {} Block section ***".format(conn_block))
         print("\n")
@@ -482,10 +375,12 @@ def order_init(MasterXmlBlock, BasePath):
             traffic_consolidation = extract_inout(random_filepath)
 
             # Uncomment to view the block connections
-            # display_out(traffic_consolidation)
+            display_out(traffic_consolidation)
+            exit()
             
             block_dict = grouping(traffic_consolidation)
-
+            print("Block dict", block_dict)
+            exit()
             # Separating the foreign block and current (random) block from the block_dict's key
 
             inhouse, foreign = block_separator(block_dict, MasterXmlBlock)
@@ -500,7 +395,7 @@ def order_init(MasterXmlBlock, BasePath):
     except Exception as e:
         print("Error Occured while calling Order Init function @block_ordering", e)
 
-# order_init("250LIC4032", "./single_file/new")
+order_init("250LX4032A", "./single_file/new")
 
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag
 ## Inside the total_links dictionary you can find the self connections of foreign blocks associated with user given tag
