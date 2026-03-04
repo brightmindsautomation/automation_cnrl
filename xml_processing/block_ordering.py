@@ -119,7 +119,7 @@ def block_separator(master_dict, current_tag):
 def master_only(traffic_data, block_dict, inhouse):
     ''' This function used to describe the connections of inhouse main and no foreign blocks'''
 
-    print("************   Link Explanation starts here  ***************")
+    print("************   Link Explanation starts here (Master only)  ***************")
 
     master_stat = "{} is the master/main connection holder for all connections. \
     Moreover it has been linked with following blocks{}\n"
@@ -140,7 +140,7 @@ def master_only(traffic_data, block_dict, inhouse):
 
     #. **************** Printing as per structure using ordered blocks ********
 
-    print("Ordered Blocks Final", mstr_conns)
+    # print("Ordered Blocks Final", mstr_conns)
 
     for conn_block in mstr_conns:
         print("\n")
@@ -172,7 +172,7 @@ def master_only(traffic_data, block_dict, inhouse):
 def master_and_foreign(traffic_data, block_dict, inhouse, foreign):
     ''' This function used to describe the connections of inhouse main and foreign blocks'''
 
-    print("************   Link Explanation starts here  ***************")
+    print("************   Link Explanation starts here (Master and Foreign)  ***************")
 
     master_stat = "{} is the master/main connection holder for all connections. \
 Moreover it has been linked with following blocks{}\n"
@@ -233,23 +233,23 @@ Moreover it has been linked with following blocks{}\n"
                         FgnLinkedBlocks.append(receiver)
 
     FgnLinkedBlocks = list(set(FgnLinkedBlocks))
-    # print("Foreign linked blocks", FgnLinkedBlocks)
+    print("Foreign linked blocks", FgnLinkedBlocks)
 
     if len(FgnLinkedBlocks) >0:
         #Target: If the only i/p connection is determined by FGN block then it's our first path
         for FgnLink in FgnLinkedBlocks:
             # Pick when there is only foreign input no other block input
             FgnIp = 0
-            FamIP = 0
             for tf in traffic_data:
                 if tf[0].split('.')[1] == FgnLink:
                     if tf[1].split('.')[0] != master_node:
                         FgnIp +=1
-                    else:
-                        FamIP +=1
+                    # else:
+                    #     print("Cond passed else", tf[1].split('.')[0], FgnLink)
+                    #     FamIP +=1
         
             # print("Foreign I/P and Family I/P of {}".format(FgnLink), FgnIp, FamIP)
-            if FgnIp >0 and FamIP == 0:
+            if FgnIp >0:
                 ordered_blocks.append(FgnLink)
 
     # *****************. Ordering the blocks ********** #
@@ -375,12 +375,10 @@ def order_init(MasterXmlBlock, BasePath):
             traffic_consolidation = extract_inout(random_filepath)
 
             # Uncomment to view the block connections
-            display_out(traffic_consolidation)
-            exit()
+            # display_out(traffic_consolidation)
+            
             
             block_dict = grouping(traffic_consolidation)
-            print("Block dict", block_dict)
-            exit()
             # Separating the foreign block and current (random) block from the block_dict's key
 
             inhouse, foreign = block_separator(block_dict, MasterXmlBlock)
@@ -395,7 +393,7 @@ def order_init(MasterXmlBlock, BasePath):
     except Exception as e:
         print("Error Occured while calling Order Init function @block_ordering", e)
 
-order_init("250LX4032A", "./single_file/new")
+# order_init("250PX4031B", "./single_file/new2")
 
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag
 ## Inside the total_links dictionary you can find the self connections of foreign blocks associated with user given tag

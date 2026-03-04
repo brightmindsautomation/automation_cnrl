@@ -94,8 +94,8 @@ def serch_track(search_node):
 
 
 if __name__ == "__main__":
-    search_node = "250LX4032C"
-    BasePath = "./single_file/new"   # change this
+    search_node = "250PX4031A"
+    BasePath = "./single_file/new2"   # change this
     files = os.listdir(BasePath)
     xml_ext_files = []
     for file in files:
@@ -117,6 +117,7 @@ if __name__ == "__main__":
         adj_matrix.loc[v, u] = -1    # reverse direction v -> u
 
     print("Adjacency Matrix (Note: Self loop avoided) \n", adj_matrix)
+
 
     VisitedXmls = []
     if search_node in Nodes:
