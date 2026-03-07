@@ -395,7 +395,6 @@ def order_init(MasterXmlBlock, BasePath):
 
 # order_init("250PX4031B", "./single_file/new2")
 
+
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag
 ## Inside the total_links dictionary you can find the self connections of foreign blocks associated with user given tag
-
-        
