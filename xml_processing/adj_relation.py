@@ -94,7 +94,7 @@ def serch_track(search_node):
 
 
 if __name__ == "__main__":
-    search_node = "250PX4031A"
+    search_node = "250PIC4034"
     BasePath = "./single_file/new2"   # change this
     files = os.listdir(BasePath)
     xml_ext_files = []
