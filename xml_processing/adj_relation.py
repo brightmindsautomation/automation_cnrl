@@ -56,10 +56,20 @@ def separate_prime_tags(tag_list, Masters):
                     ip_tag = tg[0].split('.')[0]
                     op_tag = tg[1].split('.')[0]
                     if ip_tag != op_tag:         # Avoiding self loops
-                        if ip_tag in Masters and op_tag in Masters:
-                            prime_tags_cons.add((op_tag, ip_tag)) # Direction alignment here
-                            NodeLoc.add(op_tag)
+                        if ip_tag in Masters:
+                            # prime_tags_cons.add((op_tag, ip_tag)) # Direction alignment here
                             NodeLoc.add(ip_tag)
+                            if op_tag in Masters:
+                                prime_tags_cons.add((op_tag, ip_tag))
+                                NodeLoc.add(op_tag)
+                        
+                        ## Below logic before FIC4621
+                        # if ip_tag in Masters and op_tag in Masters:
+                        #     prime_tags_cons.add((op_tag, ip_tag))
+                        #     NodeLoc.add(ip_tag)
+                        #     NodeLoc.add(op_tag)
+
+
 
     return list(prime_tags_cons), list(NodeLoc)
 
@@ -94,7 +104,7 @@ def serch_track(search_node):
 
 
 if __name__ == "__main__":
-    search_node = "250PIC4034"
+    search_node = "250MHS4497"
     BasePath = "./single_file/new2"   # change this
     files = os.listdir(BasePath)
     xml_ext_files = []

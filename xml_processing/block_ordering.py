@@ -29,7 +29,6 @@ def extract_inout(filepath):
     for i, inp in enumerate(inputs):
         ind_xml_resp.append((inp, outputs[i]))
         # print(f"{inp} --> {outputs[i]}")
-
     return ind_xml_resp
 
 def find_foreign(cons_tags, current_tag):
@@ -116,7 +115,7 @@ def block_separator(master_dict, current_tag):
 
 
 
-def master_only(traffic_data, block_dict, inhouse):
+def master_only(traffic_data, block_dict, inhouse, MasterNode):
     ''' This function used to describe the connections of inhouse main and no foreign blocks'''
 
     print("************   Link Explanation starts here (Master only)  ***************")
@@ -149,7 +148,7 @@ def master_only(traffic_data, block_dict, inhouse):
         for tf in traffic_data:
             # Target: Finding inner block routemap
             # Condition: either one of the block consists this conn_block or both sometimes
-            if tf[1].split('.')[1] == conn_block:  # Sender
+            if tf[1].split('.')[1] == conn_block and tf[1].split('.')[0] == MasterNode:  # Sender
                 abbr_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
                 rec_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
                 if tf[0].split('.')[0] == master_node:
@@ -157,7 +156,7 @@ def master_only(traffic_data, block_dict, inhouse):
                 else:
                     print("Block {} is sending the input to {} (Foreign {})".format(abbr_block, rec_block, tf[0].split('.')[0]))
 
-            elif tf[0].split('.')[1] == conn_block:  # Receiver
+            elif tf[0].split('.')[1] == conn_block and tf[0].split('.')[0] == MasterNode:  # Receiver
                 abbr_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
                 send_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
                 if tf[1].split('.')[0] == master_node:
@@ -169,7 +168,7 @@ def master_only(traffic_data, block_dict, inhouse):
 
 
 
-def master_and_foreign(traffic_data, block_dict, inhouse, foreign):
+def master_and_foreign(traffic_data, block_dict, inhouse, foreign, MasterNode):
     ''' This function used to describe the connections of inhouse main and foreign blocks'''
 
     print("************   Link Explanation starts here (Master and Foreign)  ***************")
@@ -339,22 +338,24 @@ Moreover it has been linked with following blocks{}\n"
         for tf in traffic_data:
             # Target: Finding inner block routemap
             # Condition: either one of the block consists this conn_block or both sometimes
-            if tf[1].split('.')[1] == conn_block:  # Sender
+            if tf[1].split('.')[1] == conn_block and tf[1].split('.')[0] == MasterNode:  # Sender
                 abbr_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
                 rec_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
                 if tf[0].split('.')[0] == master_node:
                     print("Block {} is sending the input to {} (Master)".format(abbr_block, rec_block))
+                    # print("'{}' --> '{}'".format(tf[1], tf[0]))
                 else:
                     print("Block {} is sending the input to {} (Foreign {})".format(abbr_block, rec_block, tf[0].split('.')[0]))
-
-            elif tf[0].split('.')[1] == conn_block:  # Receiver
+                    # print("'{}' --> '{}'".format(tf[1], tf[0]))
+            elif tf[0].split('.')[1] == conn_block and tf[0].split('.')[0] == MasterNode:  # Receiver
                 abbr_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
                 send_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
                 if tf[1].split('.')[0] == master_node:
                     print("Block {} is receiving the input from {} (Master)".format(abbr_block, send_block))
+                    # print("'{}' --> '{}'".format(tf[0], tf[1]))
                 else:
                     print("Block {} is receiving the input from {} (Foreign {})".format(abbr_block, send_block, tf[1].split('.')[0]))
-
+                    # print("'{}' --> '{}'".format(tf[0], tf[1]))
 
 
 
@@ -377,7 +378,6 @@ def order_init(MasterXmlBlock, BasePath):
             # Uncomment to view the block connections
             # display_out(traffic_consolidation)
             
-            
             block_dict = grouping(traffic_consolidation)
             # Separating the foreign block and current (random) block from the block_dict's key
 
@@ -386,14 +386,14 @@ def order_init(MasterXmlBlock, BasePath):
             # print("inhouse", inhouse)
             # print("foreign", foreign)
             if len(inhouse) >0 and len(foreign) >0:
-                master_and_foreign(traffic_consolidation, block_dict, inhouse, foreign)
+                master_and_foreign(traffic_consolidation, block_dict, inhouse, foreign, MasterXmlBlock)
             elif len(foreign) == 0: # incase if there is no foreign connections (xml itself)
-                master_only(traffic_consolidation, block_dict, inhouse)
+                master_only(traffic_consolidation, block_dict, inhouse, MasterXmlBlock)
 
     except Exception as e:
         print("Error Occured while calling Order Init function @block_ordering", e)
 
-# order_init("250PX4031B", "./single_file/new2")
+# order_init("250MHS4497", "./single_file/new2")
 
 
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag
