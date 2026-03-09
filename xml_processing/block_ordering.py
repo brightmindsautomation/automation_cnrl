@@ -318,9 +318,7 @@ Moreover it has been linked with following blocks{}\n"
                     if rec in ordered_blocks:
                         # print("Rec presents", rec)
                         idx = ordered_blocks.index(rec)
-                        if idx == 0:
-                            ordered_blocks.insert(idx, current)
-                        else:
+                        if current not in ordered_blocks:
                             ordered_blocks.insert(idx, current)
                     else:
                         TempQueue.append(current)
