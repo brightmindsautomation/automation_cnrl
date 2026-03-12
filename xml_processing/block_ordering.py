@@ -355,7 +355,20 @@ Moreover it has been linked with following blocks{}\n"
                     print("Block {} is receiving the input from {} (Foreign {})".format(abbr_block, send_block, tf[1].split('.')[0]))
                     # print("'{}' --> '{}'".format(tf[0], tf[1]))
 
-
+def final_display(cnn_block, send1=(0,0), send2=(0,0,0), rec1=(0,0), rec2=(0,0,0)):
+    ''' Function used to display the ordered connection '''
+    if send1[0] !=0 or send2[0] !=0 or rec1[0] !=0 or rec2[0] !=0:
+        print("\n")
+        print("***   {} Block section ***".format(cnn_block))
+        print("\n")
+    if send1[0] !=0:
+        print("Block {} is sending the input to {} (Master)".format(send1[0], send1[1]))
+    if send2[0] !=0:
+        print("Block {} is sending the input to {} (Foreign {})".format(send2[0], send2[1], send2[2]))
+    if rec1[0] !=0:
+        print("Block {} is receiving the input from {} (Master)".format(rec1[0], rec1[1]))
+    if rec2[0] !=0:
+        print("Block {} is receiving the input from {} (Foreign {})".format(rec2[0], rec2[1], rec2[2]))
 
 def order_init(MasterXmlBlock, BasePath):
     ''' Function receives input xml block and find it's ordering pattern inside the xml file '''
@@ -391,7 +404,7 @@ def order_init(MasterXmlBlock, BasePath):
     except Exception as e:
         print("Error Occured while calling Order Init function @block_ordering", e)
 
-# order_init("250MHS4497", "./single_file/new2")
+# order_init("PCDI_005", "./single_file/new2")
 
 
 ## Inside the traffic_consolidation list you can find the set of links only corresponding to the user given tag

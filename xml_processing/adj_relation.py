@@ -105,6 +105,7 @@ def serch_track(search_node):
 
 if __name__ == "__main__":
     search_node = "250MHS4497"
+    ExcludedNodes = ["PCDI_005"]    # Try not these nodes as search_node
     BasePath = "./single_file/new2"   # change this
     files = os.listdir(BasePath)
     xml_ext_files = []
@@ -138,9 +139,29 @@ if __name__ == "__main__":
             for MsBlock in Trackings:
                 Producer = MsBlock[0]
                 Receiver = MsBlock[1]
+                ''' Special Exclusion Criteria starts '''
+                if (Producer in ExcludedNodes) or (Receiver in ExcludedNodes):
+                    if (Producer == search_node) and (Producer not in VisitedXmls):
+                        VisitedXmls.append(Producer)
+                        print("\n")
+                        print("\n")
+                        print("\n ------> ----> Briefing ---> '{}'".format(Producer))
+                        print("\n")
+                        block_ordering.order_init(Producer, BasePath)
+                    
+                    if (Receiver == search_node) and (Receiver not in VisitedXmls):
+                        VisitedXmls.append(Receiver)
+                        print("\n")
+                        print("\n")
+                        print("\n ------> ----> Briefing ---> '{}'".format(Receiver))
+                        print("\n")
+                        block_ordering.order_init(Receiver, BasePath)
+                    continue
+                ''' Special Exclusion Criteria Ended '''
+
                 print("***** Block '{}' Sending Data to '{}' *****".format(Producer, Receiver))
 
-                if Producer not in VisitedXmls:
+                if (Producer not in VisitedXmls):
                     VisitedXmls.append(Producer)
                     print("\n")
                     print("\n")
@@ -148,7 +169,7 @@ if __name__ == "__main__":
                     print("\n")
                     block_ordering.order_init(Producer, BasePath)
 
-                if Receiver not in VisitedXmls:
+                if (Receiver not in VisitedXmls):
                     print("\n")
                     print("\n")
                     print("\n ------> ----> Briefing ---> '{}'".format(Receiver))
