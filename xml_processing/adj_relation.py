@@ -104,7 +104,7 @@ def serch_track(search_node):
 
 
 if __name__ == "__main__":
-    search_node = "250MHS4497"
+    search_node = "250FI4018"
     ExcludedNodes = ["PCDI_005"]    # Try not these nodes as search_node
     BasePath = "./single_file/new2"   # change this
     files = os.listdir(BasePath)
