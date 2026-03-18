@@ -87,11 +87,13 @@ def serch_track(search_node):
 
             if node_val !=0:
                 next_vertex = node_i
-                if node_val == 1:
+                if next_vertex in ExcludedNodes:   # make sure it's not iterating with excl one
+                    continue
+                if (node_val == 1) and (node_i not in ExcludedNodes):
                     xy_pair = (key_node, node_i)
                     track_list.add(xy_pair)
 
-                if node_val == -1:
+                if (node_val == -1) and (node_i not in ExcludedNodes):
                     yx_pair = (node_i, key_node)
                     track_list.add(yx_pair)
 
@@ -105,8 +107,11 @@ def serch_track(search_node):
 
 if __name__ == "__main__":
     search_node = "250FI4018"
-    ExcludedNodes = ["PCDI_005"]    # Try not these nodes as search_node
-    BasePath = "./single_file/new2"   # change this
+    ExcludedNodes = ["PCDI_005", "250CFX4071", "521FI4800"]    # Try not these nodes as search_node
+    if search_node in ExcludedNodes:
+        print("You are trying to search the excluded node - Warning")
+        exit()
+    BasePath = "./single_file/new3"   # change this
     files = os.listdir(BasePath)
     xml_ext_files = []
     for file in files:
@@ -140,23 +145,23 @@ if __name__ == "__main__":
                 Producer = MsBlock[0]
                 Receiver = MsBlock[1]
                 ''' Special Exclusion Criteria starts '''
-                if (Producer in ExcludedNodes) or (Receiver in ExcludedNodes):
-                    if (Producer == search_node) and (Producer not in VisitedXmls):
-                        VisitedXmls.append(Producer)
-                        print("\n")
-                        print("\n")
-                        print("\n ------> ----> Briefing ---> '{}'".format(Producer))
-                        print("\n")
-                        block_ordering.order_init(Producer, BasePath)
+                # if (Producer in ExcludedNodes) or (Receiver in ExcludedNodes):
+                #     if (Producer == search_node) and (Producer not in VisitedXmls):
+                #         VisitedXmls.append(Producer)
+                #         print("\n")
+                #         print("\n")
+                #         print("\n ------> ----> Briefing ---> '{}'".format(Producer))
+                #         print("\n")
+                #         block_ordering.order_init(Producer, BasePath)
                     
-                    if (Receiver == search_node) and (Receiver not in VisitedXmls):
-                        VisitedXmls.append(Receiver)
-                        print("\n")
-                        print("\n")
-                        print("\n ------> ----> Briefing ---> '{}'".format(Receiver))
-                        print("\n")
-                        block_ordering.order_init(Receiver, BasePath)
-                    continue
+                #     if (Receiver == search_node) and (Receiver not in VisitedXmls):
+                #         VisitedXmls.append(Receiver)
+                #         print("\n")
+                #         print("\n")
+                #         print("\n ------> ----> Briefing ---> '{}'".format(Receiver))
+                #         print("\n")
+                #         block_ordering.order_init(Receiver, BasePath)
+                #     continue
                 ''' Special Exclusion Criteria Ended '''
 
                 print("***** Block '{}' Sending Data to '{}' *****".format(Producer, Receiver))
