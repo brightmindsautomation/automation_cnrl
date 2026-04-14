@@ -135,6 +135,7 @@ if __name__ == "__main__":
     print("Adjacency Matrix (Note: Self loop avoided) \n", adj_matrix)
 
 
+
     VisitedXmls = []
     if search_node in Nodes:
         Trackings = serch_track(search_node)
