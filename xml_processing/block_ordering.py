@@ -149,16 +149,16 @@ def master_only(traffic_data, block_dict, inhouse, MasterNode):
             # Target: Finding inner block routemap
             # Condition: either one of the block consists this conn_block or both sometimes
             if tf[1].split('.')[1] == conn_block and tf[1].split('.')[0] == MasterNode:  # Sender
-                abbr_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
-                rec_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
+                abbr_block = tf[1].split('.')[0] + '.' + tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
+                rec_block = tf[0].split('.')[0] + '.' + tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
                 if tf[0].split('.')[0] == master_node:
                     print("Block {} is sending the input to {} (Master)".format(abbr_block, rec_block))
                 else:
                     print("Block {} is sending the input to {} (Foreign {})".format(abbr_block, rec_block, tf[0].split('.')[0]))
 
             elif tf[0].split('.')[1] == conn_block and tf[0].split('.')[0] == MasterNode:  # Receiver
-                abbr_block = tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
-                send_block = tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
+                abbr_block = tf[0].split('.')[0] + '.' + tf[0].split('.')[1] + '.' + tf[0].split('.')[2]
+                send_block = tf[1].split('.')[0] + '.' + tf[1].split('.')[1] + '.' + tf[1].split('.')[2]
                 if tf[1].split('.')[0] == master_node:
                     print("Block {} is receiving the input from {} (Master)".format(abbr_block, send_block))
                 else:
