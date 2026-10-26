@@ -166,9 +166,6 @@ def master_only(traffic_data, block_dict, inhouse, MasterNode):
 
 
 
-
-
-
 def master_and_foreign(traffic_data, block_dict, inhouse, foreign, MasterNode):
     ''' This function used to describe the connections of inhouse main and foreign blocks'''
 
