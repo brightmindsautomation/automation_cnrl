@@ -3,3 +3,14 @@ env
 *_venv
 *_files
 *_file
+*.mp4
+*.mkv
+*.jpg
+*.jpeg
+*.png
+dataset
+*.pt
+*.geojson
+feeds
+crops
+annot

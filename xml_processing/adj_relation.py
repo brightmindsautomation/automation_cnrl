@@ -1,7 +1,7 @@
 '''
 This script will read the list of given xml files, then create adjacency matrix for those master blocks.
 Master Blocks - main block of the individual xml file.
-
+last modified or run: 26th Oct 2026 (latest)
 '''
 import os
 import xml.etree.ElementTree as ET
@@ -106,12 +106,12 @@ def serch_track(search_node):
 
 
 if __name__ == "__main__":
-    search_node = "250FI4018"
+    search_node = "LICMV1"
     ExcludedNodes = ["PCDI_005", "250CFX4071", "521FI4800"]    # Try not these nodes as search_node
     if search_node in ExcludedNodes:
         print("You are trying to search the excluded node - Warning")
         exit()
-    BasePath = "./single_file/new3"   # change this
+    BasePath = "./single_file/latest"   # change this
     files = os.listdir(BasePath)
     xml_ext_files = []
     for file in files:
